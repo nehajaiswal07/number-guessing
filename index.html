@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Number Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #958f8f;
+        }
+        #game-container {
+            text-align: center;
+        }
+        #countdown {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>! Guess the Number Game !</h1>
+        <p id="instructions">Enter a number between 1 - 100:</p>
+        <button id="start-game">Start Game</button>
+        <p id="countdown">Time left: 60 seconds</p>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        function randomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function startGame() {
+            const randomIntInclusive = randomNumber(1, 100);
+            let guess_time = 1;
+            const maxAttempts = 100;
+            const countdownDuration = 60; // Duration in seconds
+            let timeRemaining = countdownDuration;
+
+            // Update the countdown display
+            function updateCountdown() {
+                document.getElementById('countdown').innerText = `Time left: ${timeRemaining} seconds`;
+            }
+
+            // Handle the countdown
+            function startCountdown() {
+                updateCountdown();
+                const countdownInterval = setInterval(() => {
+                    timeRemaining--;
+                    updateCountdown();
+                    if (timeRemaining <= 0) {
+                        clearInterval(countdownInterval);
+                        document.getElementById('result').innerText = `Time's up! The number was ${randomIntInclusive}.`;
+                    }
+                }, 1000);
+            }
+
+            // Handle user input and game logic
+            function handleUserInput() {
+                let user_input = prompt("Enter a number: ");
+                user_input = Number.parseInt(user_input);
+
+                if (isNaN(user_input) || user_input < 1 || user_input > 100) {
+                    alert("Please enter a valid number between 1 and 100.");
+                    return;
+                }
+
+                let resultText = '';
+
+                if (user_input > randomIntInclusive) {
+                    resultText = `Enter a number smaller than ${user_input}. `;
+                } else if (user_input < randomIntInclusive) {
+                    resultText = `Enter a number greater than ${user_input}. `;
+                } else {
+                    resultText = `Congratulations, you won the game! The number was ${randomIntInclusive}.`;
+                    document.getElementById('result').innerText = resultText;
+                    
+                    return; // Exit the game loop
+                }
+
+                resultText += `You have ${maxAttempts - guess_time} chances left.`;
+                document.getElementById('result').innerText = resultText;
+
+                guess_time++;
+
+                if (guess_time >= maxAttempts || timeRemaining <= 0) {
+                    document.getElementById('result').innerText = `Game Over! The number was ${randomIntInclusive}.`;
+                    return; // Exit the game loop
+                }
+
+                setTimeout(handleUserInput, 0); // Continue the game loop
+            }
+
+            startCountdown();
+            handleUserInput();
+        }
+
+        document.getElementById('start-game').addEventListener('click', startGame);
+    </script>
+</body>
+</html>
